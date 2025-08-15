@@ -110,7 +110,7 @@ namespace DACC.Runtime { // The built-in CoPilot Agent class CoPilot { private s
 class Container
 {
     private static Container _instance;
-    private static Dictionary<string, object> _registry = new();
+    private static Dictionary<string, string> _registry = new();
 
     private static readonly string _root = "./libs/";
     private static readonly string _ext = ".md";
@@ -129,9 +129,9 @@ class Container
     public object GetService(string name)
     {
         if (!_registry.ContainsKey(name))
-        {
-            //runtime treat this instance as isolated and honour the lib execution [*lib*.md]
-            _registry[name] = CoPilot.Instance.Prompt(File.Read(_root + name + _ext));
+        {            
+            //readlib: [*artefact*.md*]
+            _registry[name] = File.Read(_root + name + _ext);
         }
         //always returns a singleton instance of a specification
         return _registry[name];
@@ -155,7 +155,6 @@ class Compiler
                        "If a user requests specific lib(s), that selection is final and exclusive.";
         
         var libAnswer = CoPilot.Instance.Prompt(question);
-
 
         // Read selected libs into context
         var files = File.ReadAll(libAnswer);
@@ -186,19 +185,18 @@ class File
         }
     }
 
-    public static string[] GetList(string path)
+    public static string[] GetAll(string path)
     {
-        // Implementation left abstract; must return deterministic order
-        return new string[0];
+        return File.GetAll().Select(n=>n.Name).ToArray();
     }
 }
 
 // Directory abstraction
 class Directory
 {
-    public static string[] GetList(string path)
+    public static string[] GetAll(string path)
     {
-        return new string[0];
+        return Directory.GetAll().Select(n=>n.Name).ToArray();
     }
 }
 ```
