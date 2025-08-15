@@ -1,4 +1,4 @@
-# &#x20;DACC
+# &#x20;DACC Deterministic Agent Construction Contract
 
 # ![DACC Logo](logo.png)
 
