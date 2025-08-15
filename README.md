@@ -1,4 +1,4 @@
-# &#x20;DACC
+# &#x25;DACC
 
 # ![DACC Logo](logo.png) DACC
 
@@ -38,7 +38,7 @@ Provide a brief example of how to use DACC in code:
 using DACC.Runtime;
 
 var agent = new Agent();
-agent.BootLoad("Your prompt here");
+agent.Compile("Your prompt here");
 ```
 
 ---
@@ -57,11 +57,11 @@ We welcome contributions! Please follow these steps:
 
 ## License
 
-This project is licensed under the **[Your License Here]**. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
 
 ---
 
 ## Contact
 
-For questions or support, contact **[Your Name]** at [[your.email@example.com](mailto\:your.email@example.com)].
+For questions or support, contact **Zack Evans** at [[z.evans@caprisoft.co.za](mailto\:z.evans@caprisoft.co.za)].
 
