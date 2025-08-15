@@ -173,7 +173,6 @@ class File
 {
     public static string Read(string path)
     {
-        // Implementation left abstract for DACC runtime
         return File.ReadAllText(path);
     }
     
@@ -188,7 +187,7 @@ class Directory
 {
     public static string[] GetAll(string path)
     {
-        return Directory.GetAll().Select(n=>n.Name).ToArray();
+        return Directory.GetAll().Select(n=>n.FullPath).ToArray();
     }
 }
 ```
