@@ -180,14 +180,63 @@ class Directory {
 
 ---
 
-## Contract on Load
-When this file is loaded as context, the agent must:
-1. Treat this specification as authoritative for interpreting prompts about these constructs.
-2. Use exact signatures and the deterministic error tokens when simulating or performing invocations.
-3. Refuse ambiguous interpretations by returning a single-line error with one of the defined error strings.
-4. Inject the `Runtime` classes.
-5. Validate user prompt and invoke against available classes in context.
-6. Optionally load supporting files: `File.ReadAll("./libs","*_factory.md")`.
+## Contract on Load (DACC)
+
+When this DACC specification is loaded as context, the agent **must**:
+
+1. **Treat the specification as authoritative**  
+   - All constructs (`Namespace`, `Type`, `Class`, `Field`, `Property`, `Method`, `Interface`, `Container`) must be interpreted exactly as defined in this spec.  
+   - Any deviation or ambiguous input must trigger one of the defined deterministic errors.
+
+2. **Inject Runtime Classes**  
+   - `Runtime.CoPilot`  
+   - `Runtime.Container`  
+   - `Runtime.Compiler`  
+   - `Runtime.File`  
+   - `Runtime.Directory`  
+   These classes are globally available to the agent for prompt execution, library management, and compilation.
+
+3. **Load Supporting Libraries**  
+   - Automatically read all `./libs/*.md` files **only once** using:  
+     ```csharp
+     File.ReadAll(Directory.GetList("./libs").Where(f => f.EndsWith("_factory.md")).ToArray());
+     ```
+   - Selected libraries are injected into context **before processing any user prompt**.
+   - Library loading must be **deterministic** (sorted by filename).
+
+4. **Validate User Prompts**  
+   - Ensure all requested constructs exist and signatures match exactly.  
+   - Reject ambiguous or unrecognized input by returning one of:
+     - `INTERFACE_SIGNATURE_MISMATCH`  
+     - `PROPERTY_VALIDATION_FAILED`  
+     - `METHOD_INVOCATION_FAILED`  
+     - `TYPE_NOT_FOUND`  
+     - `UNRECOGNIZED_CONSTRUCT`
+
+5. **Compile and Execute Prompt**  
+   - Use `Runtime.Compiler.Compile(prompt)` to:  
+     1. Determine relevant libraries (via `CoPilot.Prompt`).  
+     2. Inject selected libraries into context.  
+     3. Execute the user prompt against loaded `Namespace` and `Type` definitions.  
+   - All outputs must be **deterministic** based on prompt content + current container state.
+
+6. **Optional File/Library Selection**  
+   - If the user prompt explicitly requests certain libraries, only those libraries are loaded.  
+   - Otherwise, all supporting `_factory.md` files are considered candidates for injection.
+
+7. **Strict Placeholder Matching**  
+   - Parameter names in JSON must exactly match `<paramName>` in method signatures.  
+   - Public vs private identifiers (`Name` vs `name`) are case-sensitive.  
+   - Type references must match either primitive tokens or fully qualified `<NamespaceName>.<TypeName>`.
+
+8. **Deterministic Execution**  
+   - The agent must avoid any non-deterministic behavior (e.g., random file order, implicit type inference).  
+   - All runtime state changes occur **only** via declared `Fields`, `Properties`, or explicit Interface calls.
+
+---
+
+*End of DACC Contract on Load*
+
 
 ---
 
