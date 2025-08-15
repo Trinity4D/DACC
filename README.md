@@ -1,4 +1,4 @@
-# &#x25;DACC
+# &#x20;DACC
 
 # ![DACC Logo](logo.png) DACC
 
