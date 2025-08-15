@@ -29,6 +29,92 @@ cd DACC
 
 ---
 
+## Internals
+
+Brief overview of the internal structures
+
+```csharp
+namespace Runtime
+
+//The Built in CoPilot Agent
+class CoPilot {  
+  
+  //Singleton Instance
+  public static CoPilot Instance ()=> this;
+
+  // CoPilot Native Prompt Abstraction
+  public object Prompt(string prompt);
+}
+
+//The Container is a locator for lib files located in [./libs/*.md]
+class Container { 
+  static Dictionary<string, object> _registry = new();
+  
+  static string _ext = ".md";
+  static string[] _libFiles = new[];
+
+  //runs when this specification document is loaded
+  static Container(){
+      // lib files located in [./libs/*.md]
+      _libFiles = File.GetList(Root);
+  }
+  public static string Root ()=> "./libs/";
+
+  //Singleton Instance
+  public static Container Instance ()=> this;
+  
+  // Read in any lib *.md file only once. **singleton**
+  public object GetService(string name)
+  {
+    if(!_registry.ContainsKey(name))
+    {
+      _registry.Add(name, File.Open(Root + name + _ext));
+    }
+
+    return _registry[name];
+  }
+}
+class Compiler {  
+  
+  // Compiles a User Prompt and returns each element in code block format
+  public object Compile(string prompt)
+  {
+      // Get's all lib files and select only name into array and join the string
+      var libs = String.Join(",", File.GetList().Select(p=> p.FullPath));
+
+      //inject libs into string
+      var question = "Here is a list of libs files: {libs}. return a list by searching through each file and determining if this file is applicable to the user's request. If a user request for lib(s), then that would be final and exclusive. Please return as a list of names, could be one or more, could be none if not found";
+
+      //ask CoPilot the question
+      var libAnswer = CoPilot.Instance.Prompt(question);
+      
+      // Read in all libs **into context**
+      File.ReadAll(libAnswer);
+
+      var seed = "Please Invoke Each ";
+
+      var coPilotOutput = CoPilot.Instance.Prompt(prompt);
+      return coPilotOutput;
+  }
+}
+
+class File {  
+
+  // Read a single file into context
+  public static string Read(string path);
+  
+  // Read all files into context
+  public static string ReadAll(string root, string wildcard);
+
+   // Returns a array of 'full path of file' names
+  public static string[] GetList(string path);
+}
+class Directory {  
+  // Returns a array of 'full path of directory' names
+  public static string[] GetList(string path);
+}
+```
+
 ## Usage
 
 Provide a brief example of how to use DACC in code:
