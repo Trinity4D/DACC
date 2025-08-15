@@ -174,7 +174,7 @@ class File
     public static string Read(string path)
     {
         // Implementation left abstract for DACC runtime
-        return null;
+        return File.ReadAllText(path);
     }
     
     public static string[] GetAll(string path)
