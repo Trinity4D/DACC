@@ -14,6 +14,71 @@
 - Minimal but precise specification to guide agent construction and execution.
 
 ---
+# DACC Quick Reference
+
+## 1. Purpose
+- Defines canonical structure and runtime behavior for:  
+  `Namespace`, `Type`, `Class`, `Field`, `Property`, `Method`, `Interface`, `Container`  
+- Deterministic contract — **agent must treat as authoritative**.
+
+## 2. Conventions
+- Identifiers: `[A-Za-z_][A-Za-z0-9_]*`  
+- Types: `int`, `string`, `void` or `<NamespaceName>.<TypeName>`  
+- Signatures: exact name + ordered parameters  
+- Matching: **case-sensitive**  
+- Errors: deterministic strings (see Errors section)
+
+## 3. Placeholders
+| Placeholder | Meaning |
+|-------------|---------|
+| `<NamespaceName>` | Namespace identifier |
+| `<TypeName>` | Class/type identifier |
+| `<Identifier>` | Generic variable/param identifier |
+| `<Type>` | Primitive or qualified type |
+| `<Name>` | Public member (Property/Method) |
+| `<name>` | Private field |
+| `<paramName>` | JSON param key |
+| `<ReturnType>` | Return type |
+| `<mod>` | Modifier (`public`, `private`, `readonly` etc.) |
+
+## 4. Elements & Syntax
+| Element | Syntax | Notes |
+|---------|-------|------|
+| Namespace | `namespace <NamespaceName>` | Logical container |
+| Class | `type <TypeName> { /* members */ }` | Instance: `new <NamespaceName>.<TypeName>()` |
+| Field | `<mod> <Type> <name>;` | Direct storage, mutates container |
+| Property | `<mod> <Type> <Name> { get; set; }` | Validation failure → `PROPERTY_VALIDATION_FAILED` |
+| Method | `<mod> <ReturnType> <Name>(<Type <paramName>, ...>)` | Deterministic mapping from inputs+state |
+| Interface | `interface <TypeName> { <ReturnType> <MethodName>(<Type <paramName>, ...>); }` | External call contract |
+
+## 5. Runtime (DACC.Runtime)
+- **CoPilot**: singleton, handles `Prompt(string)`  
+- **Container**: singleton, manages `./libs/*.md`  
+- **Compiler**: selects & injects relevant libraries, executes user prompts  
+- **File**: read abstraction  
+- **Directory**: list files abstraction  
+
+## 6. Contract on Load
+1. Treat spec as authoritative  
+2. Inject runtime classes: `CoPilot`, `Container`, `Compiler`, `File`, `Directory`  
+3. Load supporting libraries once (`_factory.md` files), deterministic  
+4. Validate user prompts → return deterministic errors if invalid  
+5. Compile/execute prompts via `Runtime.Compiler.Compile(prompt)`  
+6. Optional: load only requested libraries  
+7. Strict placeholder matching (case-sensitive, param names, types)  
+8. Deterministic execution only via declared fields/properties/interfaces  
+
+## 7. Errors
+- `INTERFACE_SIGNATURE_MISMATCH`  
+- `PROPERTY_VALIDATION_FAILED`  
+- `METHOD_INVOCATION_FAILED`  
+- `TYPE_NOT_FOUND`  
+- `UNRECOGNIZED_CONSTRUCT`  
+
+## 8. Machine Schema (JSON)
+- Conventions, placeholders, elements, modifiers, and errors  
+- Fully maps the DACC spec for programmatic consumption
+
 
 ## Installation
 
