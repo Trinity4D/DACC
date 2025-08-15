@@ -83,7 +83,7 @@ class Compiler {
       var libs = String.Join(",", File.GetList().Select(p=> p.FullPath));
 
       //inject libs into string
-      var question = "Here is a list of libs files: {libs}. return a list by searching through each file and determining if this file is applicable to the user's request. If a user request for lib(s), then that would be final and exclusive. Please return as a list of names, could be one or more, could be none if not found";
+      var question = "libs: {libs} ibjected here";
 
       //ask CoPilot the question
       var libAnswer = CoPilot.Instance.Prompt(question);
