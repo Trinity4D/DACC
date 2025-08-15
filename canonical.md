@@ -100,83 +100,117 @@ Rule: each placeholder denotes a single token position. Callers must provide tok
 ---
 
 ## Runtime
-namespace Runtime
-
-//The Built in CoPilot Agent
-class CoPilot {  
-  
-  //Singleton Instance
-  public static CoPilot Instance ()=> this;
-
-  // CoPilot Native Prompt Abstraction
-  public object Prompt(string prompt);
-}
-
-//The Container is a locator for lib files located in [./libs/*.md]
-class Container { 
-  static Dictionary<string, object> _registry = new();
-  
-  static string _ext = ".md";
-  static string[] _libFiles = new[];
-
-  //runs when this specification document is loaded
-  static Container(){
-      // lib files located in [./libs/*.md]
-      _libFiles = File.GetList(Root);
-  }
-  public static string Root ()=> "./libs/";
-
-  //Singleton Instance
-  public static Container Instance ()=> this;
-  
-  // Read in any lib *.md file only once. **singleton**
-  public object GetService(string name)
-  {
-    if(!_registry.ContainsKey(name))
+namespace DACC.Runtime
+{
+    // The built-in CoPilot Agent
+    class CoPilot
     {
-      _registry.Add(name, File.Open(Root + name + _ext));
+        private static CoPilot _instance;
+
+        // Singleton Instance
+        public static CoPilot Instance => _instance ??= new CoPilot();
+
+        private CoPilot() { }
+
+        // CoPilot Native Prompt Abstraction
+        public object Prompt(string prompt)
+        {
+            // Implementation left abstract for DACC agent runtime
+            return null;
+        }
     }
 
-    return _registry[name];
-  }
+    // Container manages library files located in [./libs/*.md]
+    class Container
+    {
+        private static Container _instance;
+        private static Dictionary<string, object> _registry = new();
+
+        private static readonly string _root = "./libs/";
+        private static readonly string _ext = ".md";
+        private static string[] _libFiles;
+
+        // Singleton Instance
+        public static Container Instance => _instance ??= new Container();
+
+        private Container()
+        {
+            // Load all lib filenames deterministically
+            _libFiles = File.GetList(_root).OrderBy(f => f).ToArray();
+        }
+
+        // Get library file content once
+        public object GetService(string name)
+        {
+            if (!_registry.ContainsKey(name))
+            {
+                _registry[name] = File.Read(_root + name + _ext);
+            }
+            return _registry[name];
+        }
+
+        // Return all lib file names
+        public string[] LibFiles => _libFiles;
+    }
+
+    // Compiler: processes user prompts and injects relevant libraries
+    class Compiler
+    {
+        public object Compile(string prompt)
+        {
+            // Deterministic list of lib names
+            var libs = string.Join(",", Container.Instance.LibFiles);
+
+            // Ask CoPilot which libs are relevant
+            var question = $"Here is a list of libs files: {libs}. " +
+                           "Return a list by searching through each file and determining if this file is applicable to the user's request. " +
+                           "If a user requests specific lib(s), that selection is final and exclusive.";
+            
+            var libAnswer = CoPilot.Instance.Prompt(question);
+
+            // Read selected libs into context
+            File.ReadAll(libAnswer);
+
+            // Process user prompt through CoPilot
+            var coPilotOutput = CoPilot.Instance.Prompt(prompt);
+            return coPilotOutput;
+        }
+    }
+
+    // File abstraction for reading libraries
+    class File
+    {
+        public static string Read(string path)
+        {
+            // Implementation left abstract for DACC runtime
+            return null;
+        }
+
+        public static void ReadAll(string[] paths)
+        {
+            foreach (var path in paths)
+            {
+                Read(path);
+            }
+        }
+
+        public static string[] GetList(string path)
+        {
+            // Implementation left abstract; must return deterministic order
+            return new string[0];
+        }
+    }
+
+    // Directory abstraction
+    class Directory
+    {
+        public static string[] GetList(string path)
+        {
+            return new string[0];
+        }
+    }
 }
-class Compiler {  
-  
-  // Compiles a User Prompt and returns each element in code block format
-  public object Compile(string prompt)
-  {
-      // Get's all lib files and select only name into array and join the string
-      var libs = String.Join(",", File.GetList().Select(p=> p.FullPath));
 
-      //inject libs into string
-      var question = "Here is a list of libs files: {libs}. return a list by searching through each file and determining if this file is applicable to the user's request. If a user request for lib(s), then that would be final and exclusive. Please return as a list of names, could be one or more, could be none if not found";
-
-      //ask CoPilot the question
-      var libAnswer = CoPilot.Instance.Prompt(question);
-      
-      // Read in all libs **into context**
-      File.ReadAll(libAnswer);
-
-      var coPilotOutput = CoPilot.Instance.Prompt(prompt);
-      return coPilotOutput;
-  }
-}
-
-class File {  
-
-  // Read a single file into context
-  public static string Read(string path);
-  
-  // Read all files into context
-  public static string ReadAll(string root, string wildcard);
-
-   // Returns a array of 'full path of file' names
-  public static string[] GetList(string path);
-}
-class Directory {  
-  // Returns a array of 'full path of directory' names
-  public static string[] GetList(string path);
-}
 
 ---
 
