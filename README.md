@@ -122,7 +122,7 @@ class Container
     private Container()
     {
         // Load all lib filenames deterministically
-        _libFiles = File.GetList(_root).OrderBy(f => f).ToArray();
+        _libFiles = File.GetAll(_root).OrderBy(f => f).ToArray();
     }
 
     // Get library file content once
@@ -176,18 +176,10 @@ class File
         // Implementation left abstract for DACC runtime
         return null;
     }
-
-    public static void ReadAll(string[] paths)
-    {
-        foreach (var path in paths)
-        {
-            Read(path);
-        }
-    }
-
+    
     public static string[] GetAll(string path)
     {
-        return File.GetAll().Select(n=>n.Name).ToArray();
+        return File.GetAll().Select(n=>n.FullPath).ToArray();
     }
 }
 
