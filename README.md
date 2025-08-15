@@ -1,6 +1,6 @@
 # &#x20;DACC
 
-# ![DACC Logo](assets/logo.png) DACC
+# ![DACC Logo](logo.png) DACC
 
 **DACC** is a cutting-edge project designed to provide a deterministic, structured framework for building and managing agents, classes, methods, and runtime environments. It aims to simplify the flow of construction and enhance code clarity for developers and AI agents alike.
 
