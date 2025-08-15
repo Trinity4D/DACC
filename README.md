@@ -1,4 +1,5 @@
 # &#x20;Deterministic Agent Construction Contract (DACC)
+<img width="512" height="513" alt="logo" src="logo.png" />
 
 
 
