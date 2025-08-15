@@ -116,7 +116,7 @@ namespace DACC.Runtime
         public object Prompt(string prompt)
         {
             // Implementation left abstract for DACC agent runtime
-            return null;
+            return _instance.Prompt(prompt);
         }
     }
 
@@ -144,8 +144,10 @@ namespace DACC.Runtime
         {
             if (!_registry.ContainsKey(name))
             {
-                _registry[name] = File.Read(_root + name + _ext);
+                //runtime treat this instance as isolated and honour the lib execution [*lib*.md]
+                _registry[name] = CoPilot.Instance.Prompt(File.Read(_root + name + _ext));
             }
+            //always returns a singleton instance of a specification
             return _registry[name];
         }
 
@@ -168,8 +170,12 @@ namespace DACC.Runtime
             
             var libAnswer = CoPilot.Instance.Prompt(question);
 
+
             // Read selected libs into context
-            File.ReadAll(libAnswer);
+            var files = File.ReadAll(libAnswer);
+
+            // Add to CoPilot Context
+            CoPilot.Instance.Files.Add(files);
 
             // Process user prompt through CoPilot
             var coPilotOutput = CoPilot.Instance.Prompt(prompt);
