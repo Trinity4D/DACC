@@ -19,7 +19,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/DACC.git
+[git clone https://github.com/Trinity4D/DACC.git]
 
 # Navigate to the project folder
 cd DACC
