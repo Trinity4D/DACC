@@ -1,5 +1,5 @@
 # DACC: Deterministic AI Agent Runtime — Manifesto
-
+<img width="150" height="150" alt="logo" src="logo.png" />
 ## Purpose
 DACC defines a **canonical, deterministic runtime** for AI agents. It establishes a **formal contract** for agent behavior, interaction, and external communication, enabling predictable outcomes and unambiguous reasoning.  
 
