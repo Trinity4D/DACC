@@ -1,8 +1,5 @@
 # &#x20;Deterministic Agent Construction Contract (DACC)
-<img width="512" height="513" alt="logo" src="logo.png" />
-
-
-
+<img width="150" height="150" alt="logo" src="logo.png" />
 **DACC** provides a **deterministic, structured framework** for building and managing agents, classes, methods, and runtime environments. It simplifies the flow of construction, enhances clarity, and enforces deterministic behavior for AI agents and developers.
 
 ---
