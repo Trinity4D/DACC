@@ -239,7 +239,7 @@ When this DACC specification is loaded as context, the agent **must**:
 3. **Load Supporting Libraries**  
    - Automatically read all `./libs/*.md` files **only once** using:  
      ```csharp
-     File.ReadAll(Directory.GetList("./libs").Where(f => f.EndsWith("_factory.md")).ToArray());
+     File.ReadAll(Directory.GetList("./libs").Where(f => f.EndsWith("*artefact*.md")).ToArray());
      ```
    - Selected libraries are injected into context **before processing any user prompt**.
    - Library loading must be **deterministic** (sorted by filename).
@@ -262,7 +262,7 @@ When this DACC specification is loaded as context, the agent **must**:
 
 6. **Optional File/Library Selection**  
    - If the user prompt explicitly requests certain libraries, only those libraries are loaded.  
-   - Otherwise, all supporting `_factory.md` files are considered candidates for injection.
+   - Otherwise, all supporting `*artefact*.md` files are considered candidates for injection.
 
 7. **Strict Placeholder Matching**  
    - Parameter names in JSON must exactly match `<paramName>` in method signatures.  
