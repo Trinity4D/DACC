@@ -34,7 +34,7 @@ cd DACC
 Brief overview of the internal structures
 
 ```csharp
-namespace Runtime
+namespace DACC.Runtime
 
 //The Built in CoPilot Agent
 class CoPilot {  
@@ -123,8 +123,8 @@ Provide a brief example of how to use DACC in code:
 // Example usage
 using DACC.Runtime;
 
-var agent = new Agent();
-agent.Compile("Your prompt here");
+var compiler = new Compiler();
+compiler.Compile("Your prompt here");
 ```
 
 ---
