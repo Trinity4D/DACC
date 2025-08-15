@@ -71,7 +71,7 @@ Defines canonical structure and runtime behavior for:
 
 1. Treat spec as authoritative
 2. Inject runtime classes: `CoPilot`, `Container`, `Compiler`, `File`, `Directory`
-3. Load supporting `_factory.md` libraries **once**, deterministically
+3. Load supporting `*artefact*.md` libraries **once**, deterministically
 4. Validate user prompts → return deterministic errors if invalid
 5. Compile/execute prompts via `Runtime.Compiler.Compile(prompt)`
 6. Optional: load only explicitly requested libraries
