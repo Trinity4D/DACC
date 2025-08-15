@@ -8,7 +8,7 @@
 
 - Canonical structure for **Namespaces, Types, Classes, Fields, Properties, Methods, Interfaces, Containers**.
 - Deterministic runtime behavior for AI agents.
-- Modular, extendable design via supporting libraries (`_factory.md` files).
+- Modular, extendable design via supporting libraries (`*artefact*.md` files).
 - Minimal yet precise specification guiding agent construction and execution.
 - Clear error contracts for predictable outcomes.
 
