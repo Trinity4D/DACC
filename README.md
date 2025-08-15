@@ -91,50 +91,115 @@ Defines canonical structure and runtime behavior for:
 ## 🏗 Internals Overview
 
 ```csharp
-namespace DACC.Runtime
+namespace DACC.Runtime { // The built-in CoPilot Agent class CoPilot { private static CoPilot _instance;
 
-class CoPilot {
-    public static CoPilot Instance => this;
-    public object Prompt(string prompt);
+    // Singleton Instance
+    public static CoPilot Instance => _instance ??= new CoPilot();
+
+    private CoPilot() { }
+
+    // CoPilot Native Prompt Abstraction
+    public object Prompt(string prompt)
+    {
+        // Implementation left abstract for DACC agent runtime
+        return _instance.Prompt(prompt);
+    }
 }
 
-class Container {
-    static Dictionary<string, object> _registry = new();
-    static string _ext = ".md";
-    static string[] _libFiles = new[];
+// Container manages library files located in [./libs/*.md]
+class Container
+{
+    private static Container _instance;
+    private static Dictionary<string, object> _registry = new();
 
-    static Container() {
-        _libFiles = File.GetList(Root);
+    private static readonly string _root = "./libs/";
+    private static readonly string _ext = ".md";
+    private static string[] _libFiles;
+
+    // Singleton Instance
+    public static Container Instance => _instance ??= new Container();
+
+    private Container()
+    {
+        // Load all lib filenames deterministically
+        _libFiles = File.GetList(_root).OrderBy(f => f).ToArray();
     }
-    public static string Root => "./libs/";
-    public static Container Instance => this;
 
-    public object GetService(string name) {
-        if (!_registry.ContainsKey(name)) {
-            _registry.Add(name, File.Read(Root + name + _ext));
+    // Get library file content once
+    public object GetService(string name)
+    {
+        if (!_registry.ContainsKey(name))
+        {
+            //runtime treat this instance as isolated and honour the lib execution [*lib*.md]
+            _registry[name] = CoPilot.Instance.Prompt(File.Read(_root + name + _ext));
         }
+        //always returns a singleton instance of a specification
         return _registry[name];
     }
+
+    // Return all lib file names
+    public string[] LibFiles => _libFiles;
 }
 
-class Compiler {
-    public object Compile(string prompt) {
-        var libs = string.Join(",", File.GetList().Select(p => p.FullPath));
-        var question = $"libs: {libs} injected here";
+// Compiler: processes user prompts and injects relevant libraries
+class Compiler
+{
+    public object Compile(string prompt)
+    {
+        // Deterministic list of lib names
+        var libs = string.Join(",", Container.Instance.LibFiles);
+
+        // Ask CoPilot which libs are relevant
+        var question = $"Here is a list of libs files: {libs}. " +
+                       "Return a list by searching through each file and determining if this file is applicable to the user's request. " +
+                       "If a user requests specific lib(s), that selection is final and exclusive.";
+        
         var libAnswer = CoPilot.Instance.Prompt(question);
-        File.ReadAll(libAnswer);
-        return CoPilot.Instance.Prompt(prompt);
+
+
+        // Read selected libs into context
+        var files = File.ReadAll(libAnswer);
+
+        // Add to CoPilot Context
+        CoPilot.Instance.Files.Add(files);
+
+        // Process user prompt through CoPilot
+        var coPilotOutput = CoPilot.Instance.Prompt(prompt);
+        return coPilotOutput;
     }
 }
 
-class File {
-    public static string Read(string path);
-    public static void ReadAll(string[] paths);
-    public static string[] GetList(string path);
+// File abstraction for reading libraries
+class File
+{
+    public static string Read(string path)
+    {
+        // Implementation left abstract for DACC runtime
+        return null;
+    }
+
+    public static void ReadAll(string[] paths)
+    {
+        foreach (var path in paths)
+        {
+            Read(path);
+        }
+    }
+
+    public static string[] GetList(string path)
+    {
+        // Implementation left abstract; must return deterministic order
+        return new string[0];
+    }
 }
 
-class Directory {
-    public static string[] GetList(string path);
+// Directory abstraction
+class Directory
+{
+    public static string[] GetList(string path)
+    {
+        return new string[0];
+    }
 }
 ```
 
